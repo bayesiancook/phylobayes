@@ -1174,6 +1174,7 @@ void MCParameters::Init(RRMode rr, int empfreq, int ncat, int statcenter, RASMod
 		NmodeMax = Nsite;
 		ncat = Nsite;
 		FixStatCenter = 0;
+		FixNmode = 2;
 	}
 	else if (ncat == 0)	{ // cat
 		ModePrior = DirichletProcess;
@@ -1396,7 +1397,7 @@ void MCParameters::Init(RRMode rr, int empfreq, int ncat, int statcenter, RASMod
 		FixRR = 1;
 	}
 	
-	if (empfreq || catfix)	{
+	if ((empfreq == 1) || catfix)	{
 		FixStat = 1;
 	}
 }
@@ -2059,7 +2060,7 @@ void MCParameters::InitMove()	{
 				}
 				else	{
 					PushMove(ResampleSubMove,1,1,1);
-					if (FixNmode && (!ActivateSumOverModes) && (!catfix))	{
+					if ((FixNmode == 1) && (!ActivateSumOverModes) && (!catfix))	{
 						PushMove(SwitchModeIntegral,1,1,5);
 					}
 					if (! FixNmode)	{

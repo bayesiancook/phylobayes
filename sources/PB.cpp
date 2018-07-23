@@ -13,6 +13,7 @@ along with PhyloBayes. If not, see <http://www.gnu.org/licenses/>.
 
 **********************/
 
+
 #include "phylo.h"
 
 int main(int argc, char* argv[])	{
@@ -61,6 +62,7 @@ int main(int argc, char* argv[])	{
 	int conjugate = 1;
 	int nchain = 1;
 	int burnin = 1;
+	int topoburnin = 0;
 	double cutoff = 0.2;
 	int burninfactor = 5;
 	double effsize = 50;
@@ -418,6 +420,10 @@ int main(int argc, char* argv[])	{
 				i++;
 				double tmp = atof(argv[i]);
 				burninfactor = (int) (1.0 / tmp);
+			}
+			else if (s == "-topoburnin")	{
+				i++;
+				topoburnin = atoi(argv[i]);
 			}
 			else if (s == "-lexp")	{
 				lengthprior = 0;
@@ -1200,6 +1206,7 @@ int main(int argc, char* argv[])	{
 	mParam->ZipSub = zipsub;
 	mParam->SaveAll = saveall;
 
+	mParam->TopoBurnin = topoburnin;
 
 	mParam->FixRateAlpha = fixratealpha;
 

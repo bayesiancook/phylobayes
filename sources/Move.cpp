@@ -220,33 +220,51 @@ double	PhyloBayes::Move(MoveType moveType, double delta,int N, PhyloBayes* copy)
 			break;
 
 			case NodeSliding:
-			return nodeSlidingMove2(delta, copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return nodeSlidingMove2(delta, copy);
+			}
+			return 0;
 			break;
 
 			case Global:
-			return globalMove(delta, copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return globalMove(delta, copy);
+			}
+			return 0;
 			break;
 
 			case Local:
-			return localMove2(delta, copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return localMove2(delta, copy);
+			}
+			return 0;
 			break;
 
 			case TBR:
-			return TBRMove(copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return TBRMove(copy);
+			}
+			return 0;
 			break;
 
 			case SPR:
-			if (N == -1)	{
-				return SimpleSPRMove(delta,copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				if (N == -1)	{
+					return SimpleSPRMove(delta,copy);
+				}
+				return LocalSPRMove(delta, N, copy);
 			}
-			return LocalSPRMove(delta, N, copy);
+			return 0;
 			break;
 
 			case NHSPR:
-			if (N == -1)	{
-				return NHSimpleSPRMove(delta,copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				if (N == -1)	{
+					return NHSimpleSPRMove(delta,copy);
+				}
+				return NHLocalSPRMove(delta, N, copy);
 			}
-			return NHLocalSPRMove(delta, N, copy);
+			return 0;
 			break;
 
 			case TreeLength:
@@ -272,27 +290,45 @@ double	PhyloBayes::Move(MoveType moveType, double delta,int N, PhyloBayes* copy)
 			*/
 
 			case SPRLocal:
-			return LocalSPRPartialMove(delta, N, copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return LocalSPRPartialMove(delta, N, copy);
+			}
+			return 0;
 			break;
 
 			case NHSPRLocalPartial:
-			return NHLocalSPRPartialMove(delta, N, copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return NHLocalSPRPartialMove(delta, N, copy);
+			}
+			return 0;
 			break;
 
 			case GibbsSPR:
-			return GibbsSPRMove(copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return GibbsSPRMove(copy);
+			}
+			return 0;
 			break;
 
 			case ParsGibbsSPR:
-			return ParsGibbsSPRMove(copy,delta);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return ParsGibbsSPRMove(copy,delta);
+			}
+			return 0;
 			break;
 
 			case SPRPartial:
-			return SPRPartialMove(delta, N, copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return SPRPartialMove(delta, N, copy);
+			}
+			return 0;
 			break;
 
 			case NHSPRPartial:
-			return NHSPRPartialMove(delta, N, copy);
+			if (mParam->HowManySaved >= mParam->TopoBurnin)	{
+				return NHSPRPartialMove(delta, N, copy);
+			}
+			return 0;
 			break;
 
 			case EnterPartialM:
@@ -14723,6 +14759,8 @@ void PhyloBayes::ResampleGeneRate(PhyloBayes* BackUp)	{
 
 void PhyloBayes::ResampleGeneBLMul(PhyloBayes* BackUp)	{
 
+	cerr << "mul\n";
+	exit(1);
 	for (int gene=0; gene<mParam->Ngene; gene++)	{
 		for (int j=0; j<mParam->Nnode; j++)	{
 			if (blfree(j))	{

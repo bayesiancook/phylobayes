@@ -217,6 +217,7 @@ class MCParameters {
 	ModelSwitchMode		MSMode;
 
 	int			BurnIn;
+	int 			TopoBurnin;
 
 	double			RASModelSwitch;
 	double			SUBModelSwitch;
