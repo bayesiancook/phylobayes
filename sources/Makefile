@@ -13,7 +13,6 @@ endif
 
 LIBS=$(GSLLIB)
 
-# CC=clang
 CC=g++
 SYSLIB=
 INCLUDES=
