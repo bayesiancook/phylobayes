@@ -300,14 +300,24 @@ void Sample::MeanRR()	{
 	}
 	for (int i=0; i<size; i++)	{
 		PhyloBayes* pb = GetNextPB();
+		double total = 0;
 		for (int k=0; k<Nrr; k++)	{
-			meanrr[k] += pb->ModeRR[k];
+			total += pb->ModeRR[k];
+		}
+		total /= Nrr;
+		for (int k=0; k<Nrr; k++)	{
+			meanrr[k] += pb->ModeRR[k] / total;
 		}
 	}
+	for (int k=0; k<Nrr; k++)	{
+		meanrr[k] /= size;
+	}
+	/*
 	double total = 0;
 	for (int i=0; i<Nrr; i++)	{
 		total += meanrr[i];
 	}
+	*/
 	ofstream os((SampleName + ".meanrr").c_str());
 	for (int k=0; k<Nstate; k++)	{
 		os << mParam->Alphabet[k] << ' ';
@@ -322,7 +332,7 @@ void Sample::MeanRR()	{
 	*/
 	for (int i=0; i<Nstate; i++)	{
 		for (int j=i+1; j<Nstate; j++)	{
-			meanrr[(2 * Nstate - i - 1) * i / 2 + j - i - 1] /= total;
+			// meanrr[(2 * Nstate - i - 1) * i / 2 + j - i - 1] /= total;
 			// os << meanrr[(2 * Nstate - i - 1) * i / 2 + j - i - 1];
 			// os << '\n';
 			os << mParam->Alphabet[i] << '\t' << mParam->Alphabet[j] << '\t' << meanrr[(2 * Nstate - i - 1) * i / 2 + j - i - 1]  << '\n';
@@ -653,6 +663,61 @@ int Sample::ReadBench()	{
 
 }
 
+void Sample::ReadModeProfiles()	{
+
+	int nmode = mParam->GetCurrentState()->Nmode;
+	int Nstate = mParam->Nstate;
+	int size = mSize;
+
+	double** modestat = new double*[nmode];
+	for (int j=0; j<nmode; j++)	{
+		modestat[j] = new double[Nstate];
+		for (int k=0; k<Nstate; k++)	{
+			modestat[j][k] = 0;
+		}
+	}
+	double* modeweight = new double[nmode];
+	for (int j=0; j<nmode; j++)	{
+		modeweight[j] = 0;
+	}
+
+	for (int i=0; i<size; i++)	{
+
+		cerr << '.';
+
+		PhyloBayes* pb = GetNextPB();
+		PhyloBayes& PB = *pb;
+		PB.UpdateSiteNumber();
+
+		if (pb->Nmode != nmode)	{
+			cerr << "error in readmodeprofiles: number of categories of the mixture is not fixed\n";
+			exit(1);
+		}
+		for (int j=0; j<nmode; j++)	{
+			modeweight[j] += pb->SiteNumber[j];
+			for (int k=0; k<Nstate; k++)	{
+				modestat[j][k] += pb->Stationary[j][k];
+			}
+		}
+	}
+	cerr << '\n';
+
+	ofstream os((SampleName + ".modeprofiles").c_str());
+	os << nmode << '\t' << Nstate << '\n';
+	for (int j=0; j<nmode; j++)	{
+		modeweight[j] /= mParam->Nsite * size;
+		os << modeweight[j];
+		for (int k=0; k<Nstate; k++)	{
+			modestat[j][k] /= size;
+			os << '\t' << modestat[j][k];
+		}
+		os << '\n';
+	}
+
+	cerr << "mode profiles in " << SampleName << ".modeprofiles\n";
+	cerr << '\n';
+}
+
 int Sample::Read(int rates, int modes, int sitestat, double cutoff, int ncat, int ps)	{
 
 	int cons = 1;
@@ -805,6 +870,7 @@ int Sample::Read(int rates, int modes, int sitestat, double cutoff, int ncat, in
 		}
 
 		if (modes || sitestat)	{
+			/*
 			int threshold = 1;
 			int Nmode = PB.GetModeNumber();
 
@@ -838,6 +904,7 @@ int Sample::Read(int rates, int modes, int sitestat, double cutoff, int ncat, in
 				}
 
 			}
+			*/
 
 			// site stationaries
 			for (int j=0; j<Nsite; j++)	{
@@ -985,11 +1052,14 @@ int Sample::Read(int rates, int modes, int sitestat, double cutoff, int ncat, in
 	if (sitestat)	{
 		ofstream vos((SampleName + ".varsitestat").c_str());
 		ofstream SiteStat_os((SampleName + ".sitestat").c_str());
+		/*
 		SiteStat_os << "site" << '\t';
 		for (int j=0; j<mParam->Nstate; j++)	{
 			SiteStat_os << mParam->Alphabet[j] << '\t' ;
 		}
 		SiteStat_os << '\n';
+		*/
+		SiteStat_os << Nsite << '\t' << mParam->Nstate << '\n';
 		for (int i=0; i<Nsite; i++)	{
 			SiteStat_os << i+1;
 			double var = 0;
@@ -4114,12 +4184,6 @@ void Sample::HomogeneityTest(int nrep, double threshold, int priormode, int prio
 	os << "global test:\n";	
 	os << '\n';
 	os << "max \n";
-	if (maxpv < 0.05)	{
-		os << "failed\n";	
-	}
-	else	{
-		os << "succeeded\n";
-	}
 	os << "observed   : " << maxobs << '\n';
 	os << "mean pred  : " << maxmean << '\n';
 	os << "p-value    : " << maxpv << '\n';
@@ -4128,12 +4192,6 @@ void Sample::HomogeneityTest(int nrep, double threshold, int priormode, int prio
 
 	if (! skew)	{
 	os << "mean \n";
-	if (meanpv < 0.05)	{
-		os << "failed\n";	
-	}
-	else	{
-		os << "succeeded\n";
-	}
 	os << "observed   : " << meanobs << '\n';
 	os << "mean pred  : " << meanmean << '\n';
 	os << "p-value    : " << meanpv << '\n';
@@ -4291,7 +4349,7 @@ void Sample::Diversity(int nrep, int ncat, int priormode, int priorratemode, int
 
 	ofstream sos((SampleName + ".diversity").c_str());
 	sos << "observed diversity  : " << meandiversity << '\n';
-	sos << "posterior predictive: " << ppmeandiversity << '\n';
+	sos << "posterior predictive: " << ppmeandiversity << " +/- " << sqrt(ppvardiversity) << '\n';
 	sos << "z-score             : " << z << '\n';
 	sos << "pp value            : " << ((double) pvmeandiversity) / size / nrep << '\t' << "(" << pvmeandiversity << "/" << size * nrep << ")" << '\n';
 	sos << '\n';
@@ -4301,7 +4359,7 @@ void Sample::Diversity(int nrep, int ncat, int priormode, int priorratemode, int
 		dos << k << '\t' << obs[k] << '\t' << pred[k] << '\n';
 	}
 	cout << "observed diversity  : " << meandiversity << '\n';
-	cout << "posterior predictive: " << ppmeandiversity << '\n';
+	cout << "posterior predictive: " << ppmeandiversity << " +/- " << sqrt(ppvardiversity) << '\n';
 	cout << "z-score             : " << z << '\n';
 	cout << "pp value            : " << ((double) pvmeandiversity) / size / nrep << '\t' << "(" << pvmeandiversity << "/" << size * nrep << ")" << '\n';
 	cout << '\n';
@@ -4739,6 +4797,9 @@ void Sample::Dating(int ps, int verbose, double alpha)	{
 	}
 	double meanheight = 0;
 	for (int i=0; i<size; i++)	{
+
+		cerr << '.';
+
 		PhyloBayes* pb = GetNextPB();
 
 		meanchi += pb->Chi;
@@ -4839,6 +4900,8 @@ void Sample::Dating(int ps, int verbose, double alpha)	{
 		}
 
 	}
+
+	cerr << '\n';
 
 	for (int cal=0; cal<mParam->NCalib; cal++)	{
 		calunderflow[cal] /= size;

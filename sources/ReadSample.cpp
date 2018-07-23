@@ -17,6 +17,7 @@ int main(int argc, char* argv[])	{
 	int rates = 0;
 	int modes = 0;
 	int sitestat = 0;
+	int modestat = 0;
 	int grepmode = 0;
 	int coaff = 0;
 
@@ -156,7 +157,7 @@ int main(int argc, char* argv[])	{
 			else if (s == "-cl")	{
 				clustermodes = 1;
 			}
-			else if ((s == "-sz") || (s == "-ms"))	{
+			else if (s == "-sz")	{
 				i++;
 				if (i == argc) throw(0);
 				s = argv[i];
@@ -191,6 +192,9 @@ int main(int argc, char* argv[])	{
 			}
 			else if ( (s == "-ss") || (s == "-sitestat") )	{
 				sitestat = 1;
+			}
+			else if (s == "-ms")	{
+				modestat = 1;
 			}
 			else if (s == "-catgtrpoint")	{
 				catgtrpoint = 1;
@@ -274,7 +278,7 @@ int main(int argc, char* argv[])	{
 		}
 
 
-		if ((! catgtrpoint) && (! truelength) && (! sitestat) && (!modes) && (!rates) && (! clock) && (! clustermodes) && ((!mParam2) || (! mParam2->FixTopo)) )	{
+		if ((! catgtrpoint) && (! truelength) && (! sitestat) && (! modestat) && (!modes) && (!rates) && (! clock) && (! clustermodes) && ((!mParam2) || (! mParam2->FixTopo)) )	{
 
 			string name = ChainName + ".treelist";
 			if (! ifstream(name.c_str()))	{
@@ -399,6 +403,9 @@ int main(int argc, char* argv[])	{
 		}
 		else if (constcorrect)	{
 			sample->ConstantSiteCorrection(rho);
+		}
+		else if (modestat)	{
+			sample->ReadModeProfiles();
 		}
 		else {
 			sample->Read(rates, modes, sitestat, cutoff, ncat, ps);

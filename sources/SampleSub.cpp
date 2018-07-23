@@ -19,7 +19,7 @@ int main(int argc, char* argv[])	{
 	int ppred = 0;
 	int priormode = 0;
 	int priorratemode = 0;
-	int priorrootstate = 0;
+	int priorrootstate = 1;
 
 	int midpointrooting = 0;
 

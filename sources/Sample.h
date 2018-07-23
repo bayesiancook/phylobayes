@@ -28,6 +28,8 @@ class Sample	{
 	void		ReadPopEff(int ps = 0);
 	void		ReadBranchFreqs();
 
+	void		ReadModeProfiles();
+
 	void		ReadSiteLogLikelihood();
 	void 		ReadSummedLogLikelihood();
 	void		ReadFiniteTimeEntropy(double timemax, int N);
