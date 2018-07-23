@@ -1,5 +1,5 @@
 
-class timespec;
+struct timespec;
 
 class Chrono	{
 

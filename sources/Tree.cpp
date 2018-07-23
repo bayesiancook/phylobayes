@@ -1045,7 +1045,7 @@ int Tree::ReadPhylip(istream& is, PolyNode* currentNode)	{
 
 				// species label
 
-				s == "";
+				s = "";
 				do	{
 					s += c;
 					is >> c;
@@ -1119,7 +1119,7 @@ int Tree::ReadPhylip(istream& is, PolyNode* currentNode)	{
 
 				// assume this is a species name
 
-				s == "";
+				s = "";
 				do	{
 					s += c;
 					is >> c;

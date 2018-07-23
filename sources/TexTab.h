@@ -1,6 +1,6 @@
 
 #ifndef TEXTAB_H
-#define TAXTAB_H
+#define TEXTAB_H
 
 #include <sstream>
 

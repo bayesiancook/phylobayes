@@ -4317,7 +4317,7 @@ double PhyloBayes::logSeparateBLDeconstrainedPrior(int k, int j)	{
 
 	return 0;
 	double total = 0;
-	if	(! tree[j].branchLength == 0)  	{
+	if	(tree[j].branchLength != 0)  	{
 		if (tree[j].isRoot())	{
 			cerr << "??? is root\t" << tree[j].branchLength << '\n';;
 		}
