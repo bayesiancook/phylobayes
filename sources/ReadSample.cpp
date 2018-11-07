@@ -61,6 +61,7 @@ int main(int argc, char* argv[])	{
 	double rho = 1;
 
 	int sitelogl = 0;
+    int qmm = 0;
 
 	// read arguments
 
@@ -89,6 +90,9 @@ int main(int argc, char* argv[])	{
 			else if (s == "-sitelogl")	{
 				sitelogl = 1;
 			}
+            else if (s == "-qmm")   {
+                qmm = 1;
+            }
 			else if (s == "-cst")	{
 				constcorrect = 1;
 				i++;
@@ -364,6 +368,9 @@ int main(int argc, char* argv[])	{
 		else if (sitelogl)	{
 			sample->ReadSiteLogLikelihood();
 		}
+        else if (qmm)   {
+            sample->ReadQMM();
+        }
 		else if (intlnl)	{
 			sample->ReadSummedLogLikelihood();
 		}

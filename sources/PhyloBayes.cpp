@@ -3608,6 +3608,17 @@ PhyloBayes::CloneMode(PhyloBayes* from)	{
 
 }
 
+void PhyloBayes::WriteQMM(ostream& os, int mode) {
+    os << ((double) SiteNumber[mode]) / mParam->Nsite << '\t';
+    for (int j=0; j<Nrr; j++)   {
+        os << RR[mode][j] << '\t';
+    }
+    for (int j=0; j<Nstate; j++)    {
+        os << Stationary[mode][j] << '\t';
+    }
+    os << '\n';
+}
+
 void
 PhyloBayes::CloneMode(PhyloBayes* from, int mode)	{
 

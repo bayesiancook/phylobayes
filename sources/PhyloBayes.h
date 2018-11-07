@@ -67,6 +67,8 @@ class PhyloBayes	{
 		void				CloneCov(PhyloBayes* from);
 		void				CloneCov(PhyloBayes* from, int site);
 
+        void                WriteQMM(ostream& os, int mode);
+
 		// Updates
 		void				Update();
 

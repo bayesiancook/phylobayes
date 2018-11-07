@@ -22,6 +22,7 @@ class Sample	{
 
 	void		ReadCATGTRPoint();
 	void		MeanRR();
+    void        ReadQMM();
 	void		Dating(int ps = 0, int verbose = 0, double alpha = 0.05);
 	void		ReadCont(double meanlogT, int ps = 0);
 	void		ReadCont2(int ps = 0);

@@ -204,6 +204,36 @@ PhyloBayes* Sample::GetNextPB()	{
 }
 
 // ---------------------------------------------------------------------------
+//		 ReadQMM 
+// ---------------------------------------------------------------------------
+
+void Sample::ReadQMM()  {
+
+    if (! mParam->Qmode)    {
+        cerr << "error in Sample::ReadQMM: qmm not activated\n";
+        exit(1);
+    }
+	int size = GetSize();
+
+	ofstream os((SampleName + ".qmm").c_str());
+
+	for (int i=0; i<size; i++)	{
+		cerr << '.';
+		PhyloBayes* pb = GetNextPB();
+		int Nmode = pb->Nmode;
+        for (int j=0; j<Nmode; j++) {
+            os << i << '\t';
+            pb->WriteQMM(os,j);
+        }
+	}
+	cerr << '\n';
+
+	cerr << '\n';
+	cerr << "substitution matrices in " << SampleName << ".qmm\n";
+	cerr << '\n';
+}	
+
+// ---------------------------------------------------------------------------
 //		 FiniteTimeEntropy
 // ---------------------------------------------------------------------------
 
