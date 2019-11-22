@@ -2663,7 +2663,7 @@ void	MCParameters::InitFromFile(string filename)	{
 
 			else if (temp == "MCMCMC")	{
 				is >> Nchain;
-				double step;
+				double step = 1;
 				if (Nchain * step > 1)	{
 					cerr << "error after MCMCMC\n";
 					exit(1);

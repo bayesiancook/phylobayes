@@ -1,7 +1,5 @@
 #include "phylo.h"
 
-const int MaxChain = 10;
-
 extern int SamCompare(int nchain, int burnin, int stop, string* ChainName, double& disc, double& overlap, double& effsize, string outname);
 
 

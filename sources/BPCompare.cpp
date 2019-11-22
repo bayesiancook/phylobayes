@@ -1,8 +1,5 @@
 #include "phylo.h"
 
-const double default_cutoff = 0.05;
-const int MaxChain = 10;
-
 
 int main(int argc, char* argv[])	{
 

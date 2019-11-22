@@ -184,7 +184,7 @@ int main(int argc, char* argv[])	{
 				meanlength = atof(argv[i]);
 			}
 			else if ((s == "-v") || (s == "--version"))	{
-				cerr << "phylobayes version 4.1b\n";
+				cerr << "phylobayes version 4.1\n";
 				exit(1);
 			}
 			else if (s == "-d")	{
