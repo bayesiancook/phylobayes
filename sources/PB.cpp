@@ -362,6 +362,7 @@ int main(int argc, char* argv[])	{
 				prior = 1;
 				nstart = 1;
 			}
+            /*
 			else if (s == "-nchain")	{
 				replace = 1;
 				i++;
@@ -412,6 +413,7 @@ int main(int argc, char* argv[])	{
 					i--;
 				}
 			}
+            */
 			else if (s == "-effsize")	{
 				i++;
 				effsize = atof(argv[i]);
