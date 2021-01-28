@@ -113,11 +113,11 @@ int main(int argc, char* argv[])	{
 		s << name << rep;
 		// Sample sample(s.str() + "_learn.ali" + base,burnin,every,until,Path);
 		Sample sample(base + s.str() + "_learn.ali",burnin,every,until,Path);
-		double temp = sample.CV(s.str() + "_test.ali");
+		double temp = sample.CV(s.str() + "_test.ali", base + s.str());
 		ofstream os((base + s.str() + ".cv").c_str());
 		os << temp << '\n';
 		os.close();
-		exit(1);
+		exit(0);
 	}
 	else	{
 		for (int rep=0; rep<nrep; rep++)	{
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])	{
 				cout << '\n';
 				cout.flush();
 
-				double temp = sample.CV(s.str() + "_test.ali");
+				double temp = sample.CV(s.str() + "_test.ali", base + s.str());
 				ofstream os((base + s.str() + ".cv").c_str());
 				os << temp << '\n';
 				os.close();

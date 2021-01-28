@@ -80,7 +80,7 @@ class Sample	{
 	double		LeucineSkew(int** data, double* dev);
 	double		ArginineSkew(int** data, double* dev);
 
-	double		CV(string testfile);
+	double		CV(string testfile, string basename);
 	void		Cov();
 	void		CovWoOutgroup();
 

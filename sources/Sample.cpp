@@ -429,7 +429,7 @@ void Sample::ReadCATGTRPoint()	{
 //		 CV
 // ---------------------------------------------------------------------------
 
-double Sample::CV(string testfile)	{
+double Sample::CV(string testfile, string basename)	{
 
 	if (mParam->NRateModeMax == mParam->Nsite + 5)	{
 		cerr << "error in readcv : cannot compute cross validation score under the -ratecat model\n";
@@ -457,9 +457,19 @@ double Sample::CV(string testfile)	{
 	testParam->SimpleSampling = No;
 	mParam->SimpleSampling = No;
 
+    mParam->SwapData(testParam);
+    int testnsite = mParam->Nsite;
+    mParam->SwapData(testParam);
+
 	int size = GetSize();
 	double logsamp[size];
+    double** sitelogsamp = new double*[size];
+    for (int i=0; i<size; i++)  {
+        sitelogsamp[i] = new double[testnsite];
+    }
 	double min = 0;
+    double meanlog = 0;
+    double varlog = 0;
 	for (int i=0; i<size; i++)	{
 		cerr.flush();
 		PhyloBayes* pb = GetNextPB();
@@ -479,21 +489,112 @@ double Sample::CV(string testfile)	{
 		pb->SetData(-1);
 		pb->Update();
 		logsamp[i] = pb->mLogSampling;
+        double checksum = 0;
+        for (int j=0; j<testnsite; j++) {
+            sitelogsamp[i][j] = pb->mSiteLogSampling[j];
+            checksum += sitelogsamp[i][j];
+        }
+        if (fabs(logsamp[i] - checksum) > 1e-6) {
+            cerr << "error: site log likelihoods don't sum as expected\n";
+            exit(1);
+        }
 		if ((!i) || (min > logsamp[i]))	{
 			min = logsamp[i];
 		}
+        meanlog += logsamp[i];
+        varlog += logsamp[i]*logsamp[i];
 		mParam->SwapData(testParam);
 		pb->SetData(-1);
 	}
 	cerr << "\n";
 	cerr.flush();
+
+    meanlog /= size;
+    varlog /= size;
+    varlog -= meanlog*meanlog;
+
 	double total = 0;
 	for (int i=0; i<size; i++)	{
-		total += exp(min - logsamp[i]);
-	}
-	return min - log(total);
-}
+		double tmp = exp(min - logsamp[i]);
+        total += tmp;
+    }
 
+    double invess = 0;
+	for (int i=0; i<size; i++)	{
+        double w = exp(min - logsamp[i]) / total;
+        invess += w*w;
+	}
+    double ess = 1.0 / invess;
+
+    total /= size;
+	double ret = min - log(total);
+    double normapprox = meanlog - 0.5*varlog;
+
+    // site CV
+    double* cvscore = new double[testnsite];
+    double meancvscore = 0;
+
+	double* siteess = new double[testnsite];
+    double meaness = 0;
+    double miness = 0;
+
+    for (int i=0; i<testnsite; i++) {
+        double min = 0;
+        for (int j=0; j<size; j++)	{
+            if ((!j) || (min > sitelogsamp[j][i]))	{
+                min = sitelogsamp[j][i];
+            }
+        }
+
+        double tot = 0;
+        for (int j=0; j<size; j++)	{
+            tot += exp(min - sitelogsamp[j][i]);
+        }
+
+        double invess = 0;
+        for (int j=0; j<size; j++)	{
+            double w = exp(min - sitelogsamp[j][i]) / tot;
+            invess += w*w;
+        }
+        siteess[i] = 1.0 / invess;
+        if ((!i) || (miness > siteess[i]))  {
+            miness = siteess[i];
+        }
+        meaness += siteess[i];
+
+        tot /= size;
+        
+        cvscore[i] = min - log(tot);
+        meancvscore += cvscore[i];
+    }
+    meancvscore /= testnsite;
+    meaness /= testnsite;
+        
+    ofstream os((basename + ".fullcv").c_str());
+    os << "joint cv score (mcmc): " << ret << '\n';
+    os << "ess                  : " << ess << '\n';
+    if (ess < 10.0) {
+        os << "warning: small effective sample size, inaccurate mcmc estimate\n";
+    }
+    os << "normal approximation : " << normapprox << '\n';
+    os << '\n';
+    os << "site cv score        : " << testnsite * meancvscore << '\n';
+    os << "ess (mean/min)       : " << meaness << " / " << miness << '\n';
+    os << '\n';
+
+    cout << "joint cv score (mcmc): " << ret << '\n';
+    cout << "ess                  : " << ess << '\n';
+    if (ess < 10.0) {
+        cout << "warning: small effective sample size, inaccurate mcmc estimate\n";
+    }
+    cout << "normal approximation : " << normapprox << '\n';
+    cout << '\n';
+    cout << "site cv score        : " << testnsite * meancvscore << '\n';
+    cout << "ess (mean/min)       : " << meaness << " / " << miness << '\n';
+    cout << '\n';
+
+    return ret;
+}
 
 
 // ---------------------------------------------------------------------------
