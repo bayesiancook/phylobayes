@@ -8,6 +8,7 @@ int main(int argc, char* argv[])	{
 	int nrep = 0;
 	int nmod = 0;
 	string* model = 0;
+    string cvtype = "sitecv";
 
 	try	{
 
@@ -28,6 +29,15 @@ int main(int argc, char* argv[])	{
 				}
 				nrep = atoi(argv[i]);
 			}
+            else if (s == "-sitecv")    {
+                cvtype = "sitecv";
+            }
+            else if ((s == "-jointcv") || (s == "-oldcv"))   {
+                cvtype = "cv";
+            }
+            else if ((s == "-normapprox") || (s == "-normcv"))  {
+                cvtype = "normcv";
+            }
 			else	{
 				nmod = argc - i - 1;
 				if (nmod == 0)	{
@@ -75,7 +85,7 @@ int main(int argc, char* argv[])	{
 	for (int i=0; i<nrep; i++)	{
 		for (int j=0; j<nmod; j++)	{
 			ostringstream s;
-			s << model[j] << basename << i << ".cv";
+			s << model[j] << basename << i << "." + cvtype;
 			if (!ifstream(s.str().c_str()))	{
 				cerr << "error in sumcv\n";
 				exit(1);

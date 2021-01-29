@@ -570,6 +570,15 @@ double Sample::CV(string testfile, string basename)	{
     meancvscore /= testnsite;
     meaness /= testnsite;
         
+    ofstream cvos((basename + ".cv").c_str());
+    cvos << ret << '\n';
+
+    ofstream sitecvos((basename + ".sitecv").c_str());
+    sitecvos << testnsite * meancvscore << '\n';
+
+    ofstream nos((basename + ".normcv").c_str());
+    nos << normapprox << '\n';
+
     ofstream os((basename + ".fullcv").c_str());
     os << "joint cv score (mcmc): " << ret << '\n';
     os << "ess                  : " << ess << '\n';
